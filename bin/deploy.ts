@@ -3,7 +3,7 @@ import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { StatelessStack } from '../infrastructure/toolchain/stateless-stack';
 import { StatefulStack } from '../infrastructure/toolchain/stateful-stack';
-import { toolchainEnvironment } from 'test-platform-cdk-constructs/deployment-stack-pipeline';
+import { TOOLCHAIN_ENVIRONMENT } from 'test-platform-cdk-constructs/deployment-stack-pipeline';
 
 const app = new cdk.App();
 
@@ -14,11 +14,11 @@ if (!deployMode) {
 
 if (deployMode === 'stateless') {
   new StatelessStack(app, 'StatelessStack', {
-    env: toolchainEnvironment,
+    env: TOOLCHAIN_ENVIRONMENT,
   });
 } else if (deployMode === 'stateful') {
   new StatefulStack(app, 'StatefulStack', {
-    env: toolchainEnvironment,
+    env: TOOLCHAIN_ENVIRONMENT,
   });
 } else {
   throw new Error("Invalid 'deployMode` set in the context");

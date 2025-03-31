@@ -1,0 +1,77 @@
+name: Pull Request Build
+
+on:
+  pull_request:
+    paths-ignore:
+      # The ignore only works only if changes to the main branch only include the following files.
+      # So if the commit only contain .md changes but the PR change contain more, the ignore fails
+      # https://github.com/actions/runner/issues/2324#issuecomment-1703345084
+      - '**.md'
+      - '**.svg'
+      - '**.drawio'
+      - '**.png'
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+    branches:
+      - main
+
+permissions: read-all
+
+# Actions Used (please keep this documented here as added)
+#  https://github.com/marketplace/actions/checkout
+#  https://github.com/marketplace/actions/setup-python
+#  https://github.com/marketplace/actions/trufflehog-oss
+#  https://github.com/marketplace/actions/checkout
+#  https://github.com/marketplace/actions/cache
+#  https://github.com/actions-rust-lang/setup-rust-toolchain
+
+env:
+  # This default the python version for the runner (some of our dependency rely on this versions)
+  #
+  # From this troubleshooting guide, pyenv is used under the Amazon Linux 2023
+  # https://docs.aws.amazon.com/amplify/latest/userguide/troubleshooting-AL2023.html#python-runtime
+  #
+  # And from pyenv docs setting this PYENV_VERSION as env-var would set the python version globally
+  PYENV_VERSION: '3.12'
+  GOENV_VERSION: '1.22'
+
+jobs:
+  pre-commit-lint-security:
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
+    steps:
+      - name: Print toolchain versions
+        run: |
+          node -v
+          python3 -V
+          pip3 -V
+          make --version
+
+      # TODO see whether we can leverage https://github.com/pre-commit/action
+      - name: Install system-wide tools dependencies
+        run: |
+          pip3 install pre-commit detect-secrets black ggshield
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: TruffleHog OSS
+        uses: trufflesecurity/trufflehog@v3.34.0
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --debug --only-verified
+
+      - name: Install dependencies
+        run: |
+          make install
+
+      - name: Lint and code formatting
+        run: |
+          make check
