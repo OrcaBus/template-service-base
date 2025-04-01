@@ -1,6 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { DeploymentStackPipeline } from 'test-platform-cdk-constructs/deployment-stack-pipeline';
+import { DeploymentStackPipeline } from '@orcabus/platform-cdk-constructs/deployment-stack-pipeline';
 import { DeployStack } from '../stage/deployment-stack';
 import { getStackProps } from '../stage/config';
 
