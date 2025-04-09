@@ -7,11 +7,12 @@ repos:
         exclude: ^(pnpm-lock.yaml)
       - id: check-yaml
       - id: detect-aws-credentials
+        args: [ --allow-missing-credentials ]
       - id: detect-private-key
       - id: end-of-file-fixer
       - id: trailing-whitespace
-    #   - id: no-commit-to-branch
-    #     args: [ --branch, main, --branch, master, --pattern, release/.* ]
+      - id: no-commit-to-branch
+        args: [ --branch, main, --branch, master, --pattern, release/.* ]
 
   - repo: https://github.com/Yelp/detect-secrets
     rev: v1.5.0
@@ -25,3 +26,10 @@ repos:
     hooks:
       - id: eslint
         exclude: ^(pnpm-lock.yaml)
+
+  - repo: local
+    hooks:
+      - id: prettier
+        name: prettier Format
+        entry: pnpm prettier
+        language: system

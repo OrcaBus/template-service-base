@@ -1,4 +1,4 @@
-name: Pull Request Build
+name: Pull Request Tests
 
 on:
   pull_request:
@@ -28,21 +28,25 @@ permissions: read-all
 #  https://github.com/marketplace/actions/cache
 #  https://github.com/actions-rust-lang/setup-rust-toolchain
 
-env:
-  # This default the python version for the runner (some of our dependency rely on this versions)
-  #
-  # From this troubleshooting guide, pyenv is used under the Amazon Linux 2023
-  # https://docs.aws.amazon.com/amplify/latest/userguide/troubleshooting-AL2023.html#python-runtime
-  #
-  # And from pyenv docs setting this PYENV_VERSION as env-var would set the python version globally
-  PYENV_VERSION: '3.12'
-  GOENV_VERSION: '1.22'
-
 jobs:
   pre-commit-lint-security:
     runs-on: ubuntu-latest
     if: ${{ !github.event.pull_request.draft }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'pnpm'
+
+      - run: corepack enable
+
       - name: Print toolchain versions
         run: |
           node -v
@@ -54,11 +58,6 @@ jobs:
       - name: Install system-wide tools dependencies
         run: |
           pip3 install pre-commit detect-secrets black ggshield
-
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: TruffleHog OSS
         uses: trufflesecurity/trufflehog@v3.34.0
@@ -75,3 +74,50 @@ jobs:
       - name: Lint and code formatting
         run: |
           make check
+
+  test-iac:
+    runs-on: ubuntu-22.04-arm
+    if: ${{ !github.event.pull_request.draft }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'pnpm'
+
+      - run: corepack enable
+
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - run: pnpm test
+
+  test-app:
+    runs-on: ubuntu-22.04-arm
+    if: ${{ !github.event.pull_request.draft }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Print toolchain versions
+        run: |
+          node -v
+          python -V
+          pip3 -V
+          make --version
+
+      - name: Install
+        working-directory: ./app
+        run: |
+          make install
+
+      - name: Install
+        working-directory: ./app
+        run: |
+          make test

@@ -2,7 +2,7 @@
 
 check:
 	@pnpm audit
-	@pnpm prettier-check
+	@pnpm prettier
 	@pnpm eslint
 	@pre-commit run --all-files
 
