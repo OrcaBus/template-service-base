@@ -3,8 +3,12 @@
 check:
 	@pnpm audit
 	@pnpm prettier
-	@pnpm eslint
+	@pnpm lint
 	@pre-commit run --all-files
+
+fix:
+	@pnpm prettier-fix
+	@pnpm lint-fix
 
 install:
 	@pnpm install --frozen-lockfile
