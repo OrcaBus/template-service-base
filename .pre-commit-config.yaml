@@ -25,7 +25,9 @@ repos:
     rev: v9.17.0
     hooks:
       - id: eslint
-        exclude: ^(pnpm-lock.yaml)
+        files: \.(m|c)?[jt]sx?$
+        types: [ file ]
+        exclude: pnpm-lock.yaml
 
   - repo: local
     hooks:
