@@ -46,6 +46,10 @@ To install all required dependencies, run:
 make install
 ```
 
+### First Steps
+
+Before using this template, search for all instances of `TODO:` comments in the codebase and update them as appropriate for your service. This includes replacing placeholder values (such as stack names).
+
 ### CDK Commands
 
 You can access CDK commands using the `pnpm` wrapper script.

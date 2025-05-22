@@ -77,7 +77,8 @@ jobs:
 
   test-iac:
     runs-on: ubuntu-22.04-arm
-    if: ${{ !github.event.pull_request.draft }}
+    # Template service base is broken with
+    if: ${{ !github.event.pull_request.draft  && github.repository != 'OrcaBus/template-service-base' }}
     steps:
       - uses: actions/checkout@v4
 

@@ -1,7 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { DeploymentStackPipeline } from '@orcabus/platform-cdk-constructs/deployment-stack-pipeline';
-import { DeployStack } from '../stage/deployment-stack';
 import { getStackProps } from '../stage/config';
 
 export class StatefulStack extends cdk.Stack {
@@ -10,15 +9,15 @@ export class StatefulStack extends cdk.Stack {
 
     new DeploymentStackPipeline(this, 'DeploymentPipeline', {
       githubBranch: 'main',
-      githubRepo: 'template-service-base',
-      stack: DeployStack,
-      stackName: 'DeployStack',
+      githubRepo: /** TODO: Replace with string. Example: */ 'service-microservice-manager',
+      stack: /** TODO: Replace with Stack (e.g. TheStateFULStack) */ undefined as unknown,
+      stackName: /** TODO: Replace with string. Example:  */ 'StatefulMicroserviceManager',
       stackConfig: {
         beta: getStackProps('BETA'),
         gamma: getStackProps('GAMMA'),
         prod: getStackProps('PROD'),
       },
-      pipelineName: 'OrcaBus-StatefulMicroservice',
+      pipelineName: /** TODO: Replace with string. Example: */ 'OrcaBus-StatefulMicroservice',
       cdkSynthCmd: ['pnpm install --frozen-lockfile --ignore-scripts', 'pnpm cdk-stateful synth'],
     });
   }
