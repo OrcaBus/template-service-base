@@ -1,5 +1,5 @@
 import { getDefaultApiGatewayConfiguration } from '@orcabus/platform-cdk-constructs/api-gateway';
-import { StageName } from '@orcabus/platform-cdk-constructs/utils';
+import { StageName } from '@orcabus/platform-cdk-constructs/shared-config/accounts';
 
 export const getStackProps = (stage: StageName) => {
   const serviceDomainNameDict: Record<StageName, string> = {
