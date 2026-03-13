@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@aws-cdk/aws-lambda-python-alpha':
+        specifier: 2.195.0-alpha.0
+        version: 2.195.0-alpha.0(aws-cdk-lib@2.195.0(constructs@10.4.2))(constructs@10.4.2)
       '@orcabus/platform-cdk-constructs':
         specifier: 0.0.12
         version: 0.0.12(@aws-cdk/aws-lambda-python-alpha@2.195.0-alpha.0(aws-cdk-lib@2.195.0(constructs@10.4.2))(constructs@10.4.2))(aws-cdk-lib@2.195.0(constructs@10.4.2))(constructs@10.4.2)
