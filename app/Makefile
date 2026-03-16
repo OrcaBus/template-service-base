@@ -12,4 +12,3 @@ check:
 fix:
 	ruff check --fix hello_world tests
 	ruff format hello_world tests
-n
