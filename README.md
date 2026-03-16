@@ -1,34 +1,42 @@
 Hello World Service
 ================================================================================
 
-- [New Here? Start Here](#new-here-start-here)
-- [Service Description](#service-description)
-  - [Name \& responsibility](#name--responsibility)
-  - [Description](#description)
-  - [API Endpoints](#api-endpoints)
-  - [Consumed Events](#consumed-events)
-  - [Published Events](#published-events)
-  - [(Internal) Data states \& persistence model](#internal-data-states--persistence-model)
-  - [Major Business Rules](#major-business-rules)
-  - [Permissions \& Access Control](#permissions--access-control)
-  - [Change Management](#change-management)
-    - [Versioning strategy](#versioning-strategy)
-    - [Release management](#release-management)
-- [Infrastructure \& Deployment](#infrastructure--deployment)
-  - [Stateful](#stateful)
-  - [Stateless](#stateless)
-  - [CDK Commands](#cdk-commands)
-  - [Stacks](#stacks)
-- [Development](#development)
-  - [Project Structure](#project-structure)
-  - [Setup](#setup)
-    - [Requirements](#requirements)
-    - [Install Dependencies](#install-dependencies)
-    - [First Steps](#first-steps)
-  - [Conventions](#conventions)
-  - [Linting \& Formatting](#linting--formatting)
-  - [Testing](#testing)
-- [Glossary \& References](#glossary--references)
+- [Hello World Service](#hello-world-service)
+  - [New Here? Start Here](#new-here-start-here)
+  - [Using This Template](#using-this-template)
+    - [1. Rename the service](#1-rename-the-service)
+    - [2. Wire up the stateless pipeline](#2-wire-up-the-stateless-pipeline)
+    - [3. Decide on stateful infrastructure](#3-decide-on-stateful-infrastructure)
+    - [4. Replace the Lambda logic](#4-replace-the-lambda-logic)
+    - [5. Update tests](#5-update-tests)
+    - [6. Update this README](#6-update-this-readme)
+  - [Service Description](#service-description)
+    - [Name \& responsibility](#name--responsibility)
+    - [Description](#description)
+    - [API Endpoints](#api-endpoints)
+    - [Consumed Events](#consumed-events)
+    - [Published Events](#published-events)
+    - [(Internal) Data states \& persistence model](#internal-data-states--persistence-model)
+    - [Major Business Rules](#major-business-rules)
+    - [Permissions \& Access Control](#permissions--access-control)
+    - [Change Management](#change-management)
+      - [Versioning strategy](#versioning-strategy)
+      - [Release management](#release-management)
+  - [Infrastructure \& Deployment](#infrastructure--deployment)
+    - [Stateful](#stateful)
+    - [Stateless](#stateless)
+    - [CDK Commands](#cdk-commands)
+    - [Stacks](#stacks)
+  - [Development](#development)
+    - [Project Structure](#project-structure)
+    - [Setup](#setup)
+      - [Requirements](#requirements)
+      - [Install Dependencies](#install-dependencies)
+      - [First Steps](#first-steps)
+    - [Conventions](#conventions)
+    - [Linting \& Formatting](#linting--formatting)
+    - [Testing](#testing)
+  - [Glossary \& References](#glossary--references)
 
 
 New Here? Start Here
@@ -45,6 +53,54 @@ That guide explains:
 - how Lambda, EventBridge, IAM, and CDK fit together
 - how deployment works across toolchain and environment stacks
 - which files to read first
+
+
+Using This Template
+--------------------------------------------------------------------------------
+
+This repository is a working example. To build a real service from it, go through the checklist below.
+
+### 1. Rename the service
+
+| What | Where |
+| ---- | ----- |
+| Module directory name | Rename `app/hello_world/` to your service name |
+| Event source constant | `infrastructure/stage/constants.ts` → `OUTGOING_EVENT_SOURCE` |
+| Incoming event filter | `infrastructure/stage/constants.ts` → `INCOMING_WORKFLOW_NAME` |
+| Incoming event detail type | `infrastructure/stage/constants.ts` → `INCOMING_DETAIL_TYPE` |
+| CDK stack name | `bin/deploy.ts` → `'OrcaBusStatelessHelloWorldStack'` |
+
+### 2. Wire up the stateless pipeline
+
+In `infrastructure/toolchain/stateless-stack.ts`, update:
+
+- `githubRepo` — your new GitHub repository name
+- `stackName` — your CloudFormation stack name
+- `pipelineName` — your CodePipeline name (convention: `OrcaBus-Stateless{ServiceName}`)
+
+### 3. Decide on stateful infrastructure
+
+If your service needs databases, buckets, or queues: fill in the TODOs in `infrastructure/toolchain/stateful-stack.ts` and `bin/deploy.ts`.
+
+If not: delete `infrastructure/toolchain/stateful-stack.ts` and remove the `stateful` branch from `bin/deploy.ts`.
+
+### 4. Replace the Lambda logic
+
+- `app/hello_world/lambdas/handler.py` — replace the hello-world business logic
+- `app/hello_world/models.py` — replace the Pydantic models with your event shapes
+
+### 5. Update tests
+
+- `app/tests/conftest.py` — update the sample event fixture
+- `app/tests/test_handler.py` — rewrite tests for your handler
+- `test/stage.test.ts` — update CDK assertions to match your stack resources
+
+### 6. Update this README
+
+- Service name, description
+- Consumed and published events tables
+- Stateless resources list under [Stateless](#stateless)
+- Remove the [Using This Template](#using-this-template) section
 
 
 Service Description
@@ -111,7 +167,7 @@ Infrastructure is managed via CDK. This template provides two types of CDK entry
 
 ### Stateful
 
-This service has no stateful resources.
+This service has no stateful resources. The `StatefulStack` is kept as a placeholder — if a future version of this service requires databases, buckets, or queues, fill in the TODOs in `infrastructure/toolchain/stateful-stack.ts`.
 
 ### Stateless
 
