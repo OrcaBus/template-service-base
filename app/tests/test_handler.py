@@ -68,7 +68,7 @@ class TestHandler:
 
         entry = mock_client.put_events.call_args.kwargs['Entries'][0]
         detail = json.loads(entry['Detail'])
-        assert detail['portalRunId'] == '20260312abcd1234'
+        assert detail['portalRunId'] == '20260312abcd1234'  # pragma: allowlist secret
         assert detail['workflowName'] == 'hello-world'
         assert detail['status'] == 'SUCCEEDED'
         assert 'processedAt' in detail
@@ -105,7 +105,7 @@ class TestModels:
         event = IncomingEvent.model_validate(sample_wrsc_event)
         assert event.detail.workflow.name == 'hello-world'
         assert event.detail.workflow.version == '1.0.0'
-        assert event.detail.portalRunId == '20260312abcd1234'
+        assert event.detail.portalRunId == '20260312abcd1234'  # pragma: allowlist secret
 
     def test_hello_world_event_detail_serializes_to_json(self):
         """HelloWorldEventDetail serializes to valid JSON with expected fields."""
@@ -114,7 +114,7 @@ class TestModels:
         from hello_world.models import HelloWorldEventDetail
 
         detail = HelloWorldEventDetail(
-            portalRunId='20260312abcd1234',
+            portalRunId='20260312abcd1234',  # pragma: allowlist secret
             workflowName='hello-world',
             status='SUCCEEDED',
             message='Hello World!',
@@ -122,7 +122,7 @@ class TestModels:
         )
         serialized = detail.model_dump_json()
         parsed = json.loads(serialized)
-        assert parsed['portalRunId'] == '20260312abcd1234'
+        assert parsed['portalRunId'] == '20260312abcd1234'  # pragma: allowlist secret
         assert parsed['workflowName'] == 'hello-world'
 
 

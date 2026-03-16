@@ -16,7 +16,7 @@ def sample_wrsc_event():
             'version': '1.0.0',
             'timestamp': '2026-03-12T00:00:00Z',
             'orcabusId': 'orcabus.workflowrun.001',
-            'portalRunId': '20260312abcd1234',
+            'portalRunId': '20260312abcd1234',  # pragma: allowlist secret
             'workflowRunName': 'hello-world-test-run',
             'workflow': {
                 'orcabusId': 'orcabus.workflow.001',
