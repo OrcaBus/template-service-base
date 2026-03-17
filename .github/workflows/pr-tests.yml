@@ -73,6 +73,7 @@ jobs:
       - name: Install dependencies
         run: |
           make install
+          (cd app && make install)
 
       - name: Lint and code formatting
         run: |

@@ -6,6 +6,7 @@ so no AWS credentials or network calls are required.
 """
 import json
 import os
+from datetime import datetime
 from unittest.mock import patch
 
 import pytest
@@ -124,7 +125,3 @@ class TestModels:
         parsed = json.loads(serialized)
         assert parsed['portalRunId'] == '20260312abcd1234'  # pragma: allowlist secret
         assert parsed['workflowName'] == 'hello-world'
-
-
-# Import at module level so it's available in test_hello_world_event_detail_serializes_to_json
-from datetime import datetime
