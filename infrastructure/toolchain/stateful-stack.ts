@@ -19,6 +19,9 @@ export class StatefulStack extends cdk.Stack {
       },
       pipelineName: /** TODO: Replace with string. Example: */ 'OrcaBus-StatefulMicroservice',
       cdkSynthCmd: ['pnpm install --frozen-lockfile --ignore-scripts', 'pnpm cdk-stateful synth'],
+      unitAppTestConfig: {
+        command: ['cd app && make install && make check && make test'],
+      },
     });
   }
 }
