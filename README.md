@@ -183,6 +183,8 @@ You can access CDK commands using the `pnpm` wrapper script.
 
 The type of stack to deploy is determined by the context set in the `./bin/deploy.ts` file.
 
+All deployments go through the `DeploymentStackPipeline` construct, which handles cross-account role assumptions and applies the correct per-environment configuration from `config.ts`. Use the pipeline sub-stack path shown below.
+
 Pattern:
 ```sh
 # Deploy a stateless stack
@@ -191,11 +193,11 @@ pnpm cdk-stateless deploy -e <stackname>
 
 Examples:
 ```sh
-# Deploy the BuildPipeline stack
+# Deploy the toolchain pipeline stack (sets up CodePipeline in the bastion account)
 pnpm cdk-stateless deploy -e OrcaBusStatelessHelloWorldStack
 
-# Manually deploy the development stack
-pnpm cdk-stateless deploy -e OrcaBusStatelessHelloWorldStack/DeploymentPipeline/OrcaBusBeta/HelloWorldStack
+# Manually deploy the HelloWorld stack to the beta (dev) environment
+pnpm cdk-stateless deploy OrcaBusStatelessHelloWorldStack/DeploymentPipeline/OrcaBusBeta/HelloWorldStack -e
 ```
 
 ### Stacks
@@ -282,6 +284,12 @@ To run linting and formatting checks on the root project, use:
 make check
 ```
 
+To also lint the app (Python), use `check-all` — this is what CI runs:
+
+```sh
+make check-all
+```
+
 To automatically fix issues with ESLint and Prettier, run:
 
 ```sh
@@ -293,8 +301,14 @@ make fix
 Unit tests are available for the Lambda handler and Pydantic models. Test code is hosted alongside business logic in `./app/tests/`.
 
 ```sh
-make test
+# Python unit tests (no Docker required)
+cd app && make test
+
+# CDK infrastructure tests (requires Docker Desktop to be running)
+pnpm test
 ```
+
+> **Note:** The CDK tests synthesize the Lambda layer using Docker. If Docker is not running, `pnpm test` will fail with `Cannot connect to the Docker daemon`. Start Docker Desktop before running CDK tests locally.
 
 
 Glossary & References
