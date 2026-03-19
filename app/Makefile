@@ -1,8 +1,14 @@
+.PHONY: install test check fix
+
+install:
+	pip install -r requirements-dev.txt
+
+test:
+	pytest tests/ --cov=hello_world --cov-report=term-missing
 
 check:
-	echo "No check command defined."
-	exit 1
+	ruff check hello_world tests
 
 fix:
-	echo "No fix command defined."
-	exit 1
+	ruff check --fix hello_world tests
+	ruff format hello_world tests

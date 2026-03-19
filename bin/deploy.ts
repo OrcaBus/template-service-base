@@ -4,7 +4,6 @@ import * as cdk from 'aws-cdk-lib';
 import { StatelessStack } from '../infrastructure/toolchain/stateless-stack';
 import { StatefulStack } from '../infrastructure/toolchain/stateful-stack';
 import { TOOLCHAIN_ENVIRONMENT } from '@orcabus/platform-cdk-constructs/deployment-stack-pipeline';
-
 const app = new cdk.App();
 
 const deployMode = app.node.tryGetContext('deployMode');
@@ -13,13 +12,9 @@ if (!deployMode) {
 }
 
 if (deployMode === 'stateless') {
-  new StatelessStack(
-    app,
-    /* TODO: Replace with string. Example: */ 'OrcaBusStateless{ServiceName}Stack',
-    {
-      env: TOOLCHAIN_ENVIRONMENT,
-    }
-  );
+  new StatelessStack(app, 'OrcaBusStatelessHelloWorldStack', {
+    env: TOOLCHAIN_ENVIRONMENT,
+  });
 } else if (deployMode === 'stateful') {
   new StatefulStack(
     app,
