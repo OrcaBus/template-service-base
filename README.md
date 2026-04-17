@@ -220,6 +220,18 @@ OrcaBusStatelessHelloWorldStack/DeploymentPipeline/OrcaBusProd/HelloWorldStack  
 ```
 
 
+### Event Archive
+
+All OrcaBus events are recorded in a universal event archive, partitioned by date:
+
+| Environment | S3 Path |
+|-------------|---------|
+| Dev | `s3://orcabus-universal-events-archive-843407916570/events/` |
+| Prod | `s3://orcabus-universal-events-archive-472057503814/events/` |
+
+Use the archive to replay or inspect past events when debugging or onboarding a new service.
+
+
 Development
 --------------------------------------------------------------------------------
 
