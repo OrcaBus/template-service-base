@@ -176,29 +176,48 @@ This service has no stateful resources. The `StatefulStack` is kept as a placeho
 
 ### CDK Commands
 
-You can access CDK commands using the `pnpm` wrapper script.
+#### What is `npx` and why do we use it?
 
-- **`cdk-stateless`**: Used to deploy stacks containing stateless resources (e.g., AWS Lambda), which can be easily redeployed without side effects.
-- **`cdk-stateful`**: Used to deploy stacks containing stateful resources (e.g., AWS DynamoDB, AWS RDS), where redeployment may not be ideal due to potential side effects.
+`npx` runs a Node.js CLI tool that is installed locally in `node_modules/.bin/` without needing to install it globally. When you see `npx cdk`, it runs the CDK CLI bundled with this project rather than whatever version might be installed on your machine — ensuring everyone uses the same version.
 
-The type of stack to deploy is determined by the context set in the `./bin/deploy.ts` file.
+This project also wraps common CDK commands behind `pnpm` scripts (e.g. `pnpm cdk-stateless`) so you rarely need to call `npx cdk` directly. Use `pnpm` scripts when available; fall back to `npx cdk` for one-off or advanced commands.
 
-All deployments go through the `DeploymentStackPipeline` construct, which handles cross-account role assumptions and applies the correct per-environment configuration from `config.ts`. Use the pipeline sub-stack path shown below.
+#### Deploy modes
 
-Pattern:
+The `deployMode` context variable controls which stacks are synthesised:
+
+| `deployMode` | Description |
+|---|---|
+| `stateless` | Lambda functions, EventBridge rules, and other resources that can be redeployed safely |
+| `stateful` | Databases, S3 buckets, queues — resources where redeployment may cause data loss |
+| `direct` | Synthesises and deploys a specific stack directly to your current AWS credentials without going through CodePipeline — useful for fast iteration in dev |
+
+#### `--require-approval never`
+
+By default CDK will pause and ask for confirmation before creating or modifying IAM roles and security group rules. Passing `--require-approval never` skips that prompt. It is safe to use in development workflows where you own the account, but avoid it in production pipelines.
+
+#### Common commands
+
 ```sh
-# Deploy a stateless stack
-pnpm cdk-stateless deploy -e <stackname>
+# List all stacks in the project
+pnpm cdk-stateless ls
+
+# Deploy the toolchain pipeline (sets up CodePipeline in the bastion account)
+pnpm cdk-stateless deploy OrcaBusStatelessHelloWorldStack
+
+# Manually push a stack directly to dev (bypasses CodePipeline, useful for quick iteration)
+npx cdk deploy -c deployMode=direct HelloWorldStack --require-approval never
+
+# Manually deploy via the pipeline sub-stack path (beta / dev environment)
+pnpm cdk-stateless deploy OrcaBusStatelessHelloWorldStack/DeploymentPipeline/OrcaBusBeta/HelloWorldStack
+
+# Synthesise CloudFormation templates without deploying (good for reviewing changes)
+pnpm cdk-stateless synth
 ```
 
-Examples:
-```sh
-# Deploy the toolchain pipeline stack (sets up CodePipeline in the bastion account)
-pnpm cdk-stateless deploy -e OrcaBusStatelessHelloWorldStack
+> **Note:** `direct` mode deploys using your current AWS CLI credentials and region. Make sure you are logged into the correct account (`aws sts get-caller-identity`) before running a direct deploy.
 
-# Manually deploy the HelloWorld stack to the beta (dev) environment
-pnpm cdk-stateless deploy OrcaBusStatelessHelloWorldStack/DeploymentPipeline/OrcaBusBeta/HelloWorldStack -e
-```
+All deployments go through the `DeploymentStackPipeline` construct, which handles cross-account role assumptions and applies the correct per-environment configuration from `config.ts`.
 
 ### Stacks
 
