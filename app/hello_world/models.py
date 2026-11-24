@@ -16,6 +16,7 @@ from pydantic import BaseModel, Field
 
 
 # ---- Incoming event models ----
+# TODO: replace with the shape of the event your service consumes.
 
 
 class Workflow(BaseModel):
@@ -51,6 +52,7 @@ class IncomingEvent(BaseModel):
 
 
 # ---- Outgoing event models ----
+# TODO: replace with the shape of the event your service emits.
 
 
 class HelloWorldEventDetail(BaseModel):

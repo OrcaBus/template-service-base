@@ -18,6 +18,11 @@ export interface HelloWorldStackProps extends StackProps {
   stage: string;
 }
 
+/**
+ * The application stack. Deployment names (class, stack name) come from the service name.
+ * TODO: the resources inside are the Hello World example app (Lambda, layer, EventBridge rule,
+ * permissions, event names). This is app logic: replace it with what your service needs.
+ */
 export class HelloWorldStack extends Stack {
   private readonly lambdaRuntimePythonVersion: aws_lambda.Runtime = aws_lambda.Runtime.PYTHON_3_12;
   private readonly mainBus: IEventBus;

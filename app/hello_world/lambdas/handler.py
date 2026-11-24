@@ -47,6 +47,7 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         f'workflow={wrsc.workflow.name}, status={wrsc.status}'
     )
 
+    # TODO: replace this example with the business logic of your service.
     # Build outgoing event detail
     outgoing_detail = HelloWorldEventDetail(
         portalRunId=wrsc.portalRunId,
