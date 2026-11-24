@@ -1,6 +1,6 @@
 -r requirements.txt
-boto3>=1.26
-pytest>=7.0
-pytest-cov>=4.0
-moto[events]>=5.0
-ruff>=0.4
+boto3>=1.44.10
+pytest>=9.2.0
+pytest-cov>=7.1.0
+moto[events]>=5.2.6
+ruff>=0.17.6

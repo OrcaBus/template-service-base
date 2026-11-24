@@ -11,6 +11,9 @@ and is not tied to any AI tool. Tool-specific folders only point here.
     references/              Optional: longer material the skill reads on demand
     scripts/                 Optional: deterministic helpers (Python only, see below)
   scripts/check_skills.py    Verifies the tool stubs match the skills
+  logs/<skill-name>/         Output written by skills. Committed. Not prettier-checked.
+    SUMMARY.md               High level status, rewritten on every run. Read this first.
+    runs/<UTC time>.md       One full log per run, for example runs/2026-11-24T031500Z.md
 ```
 
 ## What `context/` is for
@@ -60,3 +63,4 @@ would actually type. The description is the only part Kiro sees before activatio
 | Skill | Purpose |
 | ----- | ------- |
 | `use-template` | Interviews the developer and converts this template into a real service. Removes itself when done. |
+| `update-dependencies` | Updates Node and Python dependencies. Minor and patch directly, major one version at a time after a breaking-change review, reverts and asks when unsure. Safe to re-run. |

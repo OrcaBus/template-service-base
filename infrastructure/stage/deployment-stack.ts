@@ -3,7 +3,7 @@ import { Construct } from 'constructs';
 import { Architecture } from 'aws-cdk-lib/aws-lambda';
 import { EventBus, IEventBus, Rule } from 'aws-cdk-lib/aws-events';
 import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
-import { aws_lambda, Duration, Stack, StackProps } from 'aws-cdk-lib';
+import { aws_lambda, Duration, Stack, StackProps, Validations } from 'aws-cdk-lib';
 import { PythonFunction, PythonLayerVersion } from '@aws-cdk/aws-lambda-python-alpha';
 import { ManagedPolicy, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import {
@@ -12,6 +12,9 @@ import {
   INCOMING_EVENT_SOURCE,
   INCOMING_WORKFLOW_NAME,
 } from './constants';
+
+// Local-only directories under app/ that must not be copied into the bundling container
+const BUNDLING_EXCLUDES = ['.venv', '.pytest_cache', '.ruff_cache', '__pycache__', '.coverage'];
 
 export interface HelloWorldStackProps extends StackProps {
   mainBusName: string;
@@ -42,6 +45,10 @@ export class HelloWorldStack extends Stack {
     this.lambdaRole.addManagedPolicy(
       ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole')
     );
+    Validations.of(this.lambdaRole).acknowledge({
+      id: 'AwsSolutions-IAM4',
+      reason: 'AWSLambdaBasicExecutionRole is required for Lambda CloudWatch logging',
+    });
 
     // Allow the Lambda to emit events onto the bus
     this.lambdaRole.addToPolicy(
@@ -57,6 +64,7 @@ export class HelloWorldStack extends Stack {
       compatibleRuntimes: [this.lambdaRuntimePythonVersion],
       compatibleArchitectures: [Architecture.ARM_64],
       description: 'Hello World service dependencies',
+      bundling: { assetExcludes: BUNDLING_EXCLUDES },
     });
 
     this.createHelloWorldFunction(props.mainBusName);
@@ -73,9 +81,14 @@ export class HelloWorldStack extends Stack {
       memorySize: 512,
       layers: [this.baseLayer],
       role: this.lambdaRole,
+      bundling: { assetExcludes: BUNDLING_EXCLUDES },
       environment: {
         EVENT_BUS_NAME: mainBusName,
       },
+    });
+    Validations.of(helloWorldFn).acknowledge({
+      id: 'AwsSolutions-L1',
+      reason: 'Python 3.12 is the current platform standard runtime version',
     });
 
     // EventBridge rule: route WorkflowRunStateChange events for the hello-world workflow
