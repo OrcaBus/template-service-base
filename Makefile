@@ -5,6 +5,7 @@ check:
 	@pnpm prettier
 	@pnpm lint
 	@pre-commit run --all-files
+	@python3 .ai/scripts/check_skills.py
 
 check-all: check
 	@(cd app && make check)

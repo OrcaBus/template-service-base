@@ -7,15 +7,16 @@ Outgoing: HelloWorldEvent emitted by this service
 Models can be auto-generated from JSON schema using datamodel-codegen:
   datamodel-codegen --input event-schema.json --input-file-type jsonschema --output hello_world/models.py
 """
+
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
-
 # ---- Incoming event models ----
+# TODO: replace with the shape of the event your service consumes.
 
 
 class Workflow(BaseModel):
@@ -33,24 +34,25 @@ class WorkflowRunStateChange(BaseModel):
     workflowRunName: str
     workflow: Workflow
     status: str
-    payload: Optional[Dict[str, Any]] = None
+    payload: dict[str, Any] | None = None
 
 
 class IncomingEvent(BaseModel):
     """EventBridge event envelope as delivered to Lambda."""
 
-    id: Optional[str] = None
+    id: str | None = None
     source: str
-    time: Optional[datetime] = None
-    account: Optional[str] = None
-    region: Optional[str] = None
-    detail_type: str = Field(..., alias='detail-type')
+    time: datetime | None = None
+    account: str | None = None
+    region: str | None = None
+    detail_type: str = Field(..., alias="detail-type")
     detail: WorkflowRunStateChange
 
-    model_config = {'populate_by_name': True}
+    model_config = {"populate_by_name": True}
 
 
 # ---- Outgoing event models ----
+# TODO: replace with the shape of the event your service emits.
 
 
 class HelloWorldEventDetail(BaseModel):

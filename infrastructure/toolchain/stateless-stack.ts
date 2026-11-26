@@ -8,7 +8,7 @@ export class StatelessStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    new DeploymentStackPipeline(this, 'DeploymentPipeline', {
+    const pipeline = new DeploymentStackPipeline(this, 'DeploymentPipeline', {
       githubBranch: 'main',
       githubRepo: 'template-service-base',
       stack: HelloWorldStack,
@@ -24,5 +24,16 @@ export class StatelessStack extends cdk.Stack {
         command: ['cd app && make install && make check && make test'],
       },
     });
+
+    // The pipeline's roles, buckets, keys and projects come from the platform construct
+    for (const id of [
+      'AwsSolutions-IAM4',
+      'AwsSolutions-IAM5',
+      'AwsSolutions-S1',
+      'AwsSolutions-KMS5',
+      'AwsSolutions-CB3',
+    ]) {
+      cdk.Validations.of(pipeline).acknowledge({ id, reason: 'Allow CDK Pipeline' });
+    }
   }
 }

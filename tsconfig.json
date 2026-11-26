@@ -25,7 +25,9 @@
     "typeRoots": [
       "./node_modules/@types"
     ],
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": ["node", "jest"],
+    "noUncheckedSideEffectImports": false
   },
   "exclude": [
     "node_modules",

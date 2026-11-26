@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
+import { AwsSolutionsChecks } from 'cdk-nag';
 import { StatelessStack } from '../infrastructure/toolchain/stateless-stack';
 import { StatefulStack } from '../infrastructure/toolchain/stateful-stack';
 import { TOOLCHAIN_ENVIRONMENT } from '@orcabus/platform-cdk-constructs/deployment-stack-pipeline';
 const app = new cdk.App();
+cdk.Validations.of(app).addPlugins(new AwsSolutionsChecks(app));
 
 const deployMode = app.node.tryGetContext('deployMode');
 if (!deployMode) {

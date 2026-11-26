@@ -7,7 +7,7 @@ export const APP_ROOT = path.join(__dirname, '../../app');
 /** Shared OrcaBus EventBridge bus name */
 export const EVENT_BUS = EVENT_BUS_NAME; // "OrcaBusMain"
 
-/** Events this service consumes */
+/** Events this service consumes. TODO: set the source, detail type and workflow name. */
 export const INCOMING_EVENT_SOURCE = 'orcabus.workflowmanager';
 export const INCOMING_DETAIL_TYPE = 'WorkflowRunStateChange';
 export const INCOMING_WORKFLOW_NAME = 'hello-world';
