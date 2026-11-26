@@ -7,9 +7,47 @@ resources:
   - skill://.kiro/skills/update-dependencies/SKILL.md
 permissions:
   rules:
-    # Reading: the workspace is readable by default. Block secrets and credential folders.
+    # Reading: nothing is readable by default, so list what the skill needs. Not listed on
+    # purpose: app/ (the skill says not to read it), cdk.out, .git, node_modules, and any file
+    # that may hold secrets. Anything else prompts, which is the safe failure for an unattended run.
     - capability: fs_read
-      match: ['**/.env', '**/.env.*', '**/*.pem', '**/*.key', '**/.ssh/**', '**/.aws/**']
+      match:
+        # Skill, run logs and helper scripts
+        - '.ai/**'
+        - '.kiro/skills/**'
+        # Root manifests, lockfile and tool config
+        - 'package.json'
+        - 'pnpm-workspace.yaml'
+        - 'pnpm-lock.yaml'
+        - 'tsconfig*.json'
+        - 'eslint.config.*'
+        - 'jest.config.*'
+        - '.prettierrc.json'
+        - '.prettierignore'
+        - '.pre-commit-config.yaml'
+        - 'cdk.json'
+        - 'Makefile'
+        # Code a breaking-change fix may need to read
+        - 'bin/**'
+        - 'infrastructure/**'
+        - 'test/**'
+        - '.github/workflows/**'
+        # Docs
+        - 'README.md'
+        - 'AGENTS.md'
+      effect: allow
+    # Second guard in case an allow pattern above turns out too broad.
+    - capability: fs_read
+      match:
+        - '**/.env'
+        - '**/.env.*'
+        - '**/*.pem'
+        - '**/*.key'
+        - '**/.ssh/**'
+        - '**/.aws/**'
+        - '**/node_modules/**'
+        - '**/.git/**'
+        - 'app/**'
       effect: deny
 
     # Writing: root manifests and lockfile, code and config a breaking-change fix may touch, and logs.
