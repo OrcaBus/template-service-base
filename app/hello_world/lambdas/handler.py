@@ -4,11 +4,12 @@ Hello World Lambda handler.
 Receives WorkflowRunStateChange events from the OrcaBus EventBridge bus,
 validates them via Pydantic, and emits a HelloWorldEvent back to the bus.
 """
+
 import json
 import logging
 import os
-from datetime import datetime, timezone
-from typing import Any, Dict
+from datetime import UTC, datetime
+from typing import Any
 
 import boto3
 
@@ -18,14 +19,14 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 # Initialise the boto3 client outside the handler for connection reuse across invocations
-events_client = boto3.client('events')
+events_client = boto3.client("events")
 
-EVENT_BUS_NAME = os.environ.get('EVENT_BUS_NAME', 'OrcaBusMain')
-EVENT_SOURCE = 'orcabus.helloworld'
-EVENT_DETAIL_TYPE = 'HelloWorldEvent'
+EVENT_BUS_NAME = os.environ.get("EVENT_BUS_NAME", "OrcaBusMain")
+EVENT_SOURCE = "orcabus.helloworld"
+EVENT_DETAIL_TYPE = "HelloWorldEvent"
 
 
-def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
+def lambda_handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
     """
     Lambda entrypoint. Parses the incoming OrcaBus event and emits a HelloWorldEvent.
 
@@ -36,15 +37,15 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     Returns:
         Dict with statusCode and eventId of the emitted event
     """
-    logger.info(f'Received event: {json.dumps(event, default=str)}')
+    logger.info(f"Received event: {json.dumps(event, default=str)}")
 
     # Parse and validate the incoming event using Pydantic
     incoming = IncomingEvent.model_validate(event)
     wrsc = incoming.detail
 
     logger.info(
-        f'Processing WorkflowRunStateChange: portalRunId={wrsc.portalRunId}, '
-        f'workflow={wrsc.workflow.name}, status={wrsc.status}'
+        f"Processing WorkflowRunStateChange: portalRunId={wrsc.portalRunId}, "
+        f"workflow={wrsc.workflow.name}, status={wrsc.status}"
     )
 
     # TODO: replace this example with the business logic of your service.
@@ -57,13 +58,13 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             f"Hello World! Processed workflow run '{wrsc.workflowRunName}' "
             f"with status '{wrsc.status}'."
         ),
-        processedAt=datetime.now(tz=timezone.utc),
+        processedAt=datetime.now(tz=UTC),
     )
 
     event_id = emit_event(outgoing_detail)
-    logger.info(f'Emitted HelloWorldEvent with id: {event_id}')
+    logger.info(f"Emitted HelloWorldEvent with id: {event_id}")
 
-    return {'statusCode': 200, 'eventId': event_id}
+    return {"statusCode": 200, "eventId": event_id}
 
 
 def emit_event(detail: HelloWorldEventDetail) -> str:
@@ -82,18 +83,20 @@ def emit_event(detail: HelloWorldEventDetail) -> str:
     response = events_client.put_events(
         Entries=[
             {
-                'Source': EVENT_SOURCE,
-                'DetailType': EVENT_DETAIL_TYPE,
-                'Detail': detail.model_dump_json(),
-                'EventBusName': EVENT_BUS_NAME,
+                "Source": EVENT_SOURCE,
+                "DetailType": EVENT_DETAIL_TYPE,
+                "Detail": detail.model_dump_json(),
+                "EventBusName": EVENT_BUS_NAME,
             }
         ]
     )
 
-    if response['FailedEntryCount'] > 0:
+    if response["FailedEntryCount"] > 0:
         errors = [
-            e.get('ErrorMessage', 'unknown') for e in response['Entries'] if 'ErrorCode' in e
+            e.get("ErrorMessage", "unknown")
+            for e in response["Entries"]
+            if "ErrorCode" in e
         ]
-        raise RuntimeError(f'EventBridge put_events failed: {errors}')
+        raise RuntimeError(f"EventBridge put_events failed: {errors}")
 
-    return response['Entries'][0]['EventId']
+    return response["Entries"][0]["EventId"]
